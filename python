@@ -1,0 +1,61 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from keras.datasets import mnist
+
+# Load MNIST dataset
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+# Basic statistics of the dataset
+def describe_data(x, y, dataset_name):
+    print(f"{dataset_name} data shape: {x.shape}")
+    print(f"{dataset_name} labels shape: {y.shape}")
+    print(f"Number of unique labels in {dataset_name}: {np.unique(y)}")
+    print(f"Distribution of labels in {dataset_name}:\n {pd.Series(y).value_counts().sort_index()}")
+
+describe_data(x_train, y_train, "Training")
+describe_data(x_test, y_test, "Test")
+
+# Visualize the distribution of labels
+def plot_label_distribution(y, dataset_name):
+    plt.figure(figsize=(8, 6))
+    sns.countplot(y, palette='viridis')
+    plt.title(f'Distribution of Labels in {dataset_name} Dataset')
+    plt.xlabel('Digit')
+    plt.ylabel('Count')
+    plt.show()
+
+plot_label_distribution(y_train, "Training")
+plot_label_distribution(y_test, "Test")
+
+# Visualize some random samples of the training data
+def visualize_samples(x, y, samples_per_class=5):
+    num_classes = len(np.unique(y))
+    fig, axes = plt.subplots(num_classes, samples_per_class, figsize=(samples_per_class * 2, num_classes * 2))
+    for i in range(num_classes):
+        class_idxs = np.where(y == i)[0]
+        selected_idxs = np.random.choice(class_idxs, samples_per_class, replace=False)
+        for j, idx in enumerate(selected_idxs):
+            axes[i, j].imshow(x[idx], cmap='gray')
+            axes[i, j].axis('off')
+            if j == 0:
+                axes[i, j].set_title(f"Digit: {i}", fontsize=12)
+    plt.tight_layout()
+    plt.show()
+
+visualize_samples(x_train, y_train)
+
+# Explore pixel intensity distribution
+def plot_pixel_intensity_distribution(x, dataset_name):
+    pixel_values = x.flatten()
+    plt.figure(figsize=(10, 6))
+    plt.hist(pixel_values, bins=50, color='gray', edgecolor='black')
+    plt.title(f'Pixel Intensity Distribution in {dataset_name} Dataset')
+    plt.xlabel('Pixel Intensity')
+    plt.ylabel('Frequency')
+    plt.xlim([0, 255])
+    plt.show()
+
+plot_pixel_intensity_distribution(x_train, "Training")
+plot_pixel_intensity_distribution(x_test, "Test")
